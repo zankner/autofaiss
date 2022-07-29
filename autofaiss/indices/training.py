@@ -77,8 +77,11 @@ def _train_index(
         ), "FAISS was not compiled with GPU support, or loading _swigfaiss_gpu.so failed"
         res = faiss.StandardGpuResources()
         dev_no = 0
+        # solving gpu issues with float look up
+        co = faiss.GpuClonerOptions()
+        co.useFloat16 = True
         # transfer to GPU (may be partial).
-        index = faiss.index_cpu_to_gpu(res, dev_no, index)
+        index = faiss.index_cpu_to_gpu(res, dev_no, index, co)
 
     with Timeit(
         f"-> Training the index with {train_vectors.shape[0]} vectors of dim {train_vectors.shape[1]}", indent=2
